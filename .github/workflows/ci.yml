@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Test on Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 21]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test:run
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke test - Help
+        run: node dist/index.js --help
+
+      - name: Smoke test - Version
+        run: node dist/index.js --version
+
+      - name: Upload coverage
+        if: matrix.node == 20
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage-final.json
+        continue-on-error: true
+
+  build-check:
+    name: Build Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Check shebang
+        run: |
+          if ! head -n 1 dist/index.js | grep -q '#!/usr/bin/env node'; then
+            echo "Error: Shebang not found in dist/index.js"
+            exit 1
+          fi
+          echo "✓ Shebang present in dist/index.js"
+
+      - name: Check executable bit
+        run: |
+          if [ ! -x dist/index.js ]; then
+            echo "Error: dist/index.js is not executable"
+            exit 1
+          fi
+          echo "✓ dist/index.js is executable"
