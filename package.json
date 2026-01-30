@@ -1,6 +1,6 @@
 {
-  "name": "websketch",
-  "version": "0.1.0",
+  "name": "@mcp-tool-shop/websketch",
+  "version": "0.2.0",
   "description": "CLI for WebSketch IR - render, diff, and fingerprint web UI captures",
   "type": "module",
   "main": "dist/index.js",
