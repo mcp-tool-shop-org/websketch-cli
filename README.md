@@ -1,6 +1,6 @@
 # websketch
 
-CLI for [WebSketch IR](https://github.com/mcp-tool-shop/websketch-ir) - render, diff, and fingerprint web UI captures.
+CLI for [WebSketch IR](https://github.com/mcp-tool-shop-org/websketch-ir) - render, diff, and fingerprint web UI captures.
 
 ## Installation
 
@@ -109,8 +109,8 @@ TOP CHANGES (by area)
 
 This CLI works with WebSketch IR capture files (JSON). You can create captures using:
 
-- [websketch-extension](https://github.com/mcp-tool-shop/websketch-extension) - Chrome extension
-- Programmatically via [@websketch/ir](https://github.com/mcp-tool-shop/websketch-ir)
+- [websketch-extension](https://github.com/mcp-tool-shop-org/websketch-extension) - Chrome extension
+- Programmatically via [@mcptoolshop/websketch-ir](https://github.com/mcp-tool-shop-org/websketch-ir)
 
 ## Development
 

@@ -20,7 +20,7 @@ import {
   formatDiff,
   formatDiffJson,
   type WebSketchCapture,
-} from "@websketch/ir";
+} from "@mcptoolshop/websketch-ir";
 
 // =============================================================================
 // Helpers

@@ -38,14 +38,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcp-tool-shop/websketch-cli.git"
+    "url": "git+https://github.com/mcp-tool-shop-org/websketch-cli.git"
   },
   "bugs": {
-    "url": "https://github.com/mcp-tool-shop/websketch-cli/issues"
+    "url": "https://github.com/mcp-tool-shop-org/websketch-cli/issues"
   },
-  "homepage": "https://github.com/mcp-tool-shop/websketch-cli#readme",
+  "homepage": "https://github.com/mcp-tool-shop-org/websketch-cli#readme",
   "dependencies": {
-    "@websketch/ir": "^0.1.0"
+    "@mcptoolshop/websketch-ir": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
