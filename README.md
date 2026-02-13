@@ -4,6 +4,15 @@ CLI for [WebSketch IR](https://github.com/mcp-tool-shop-org/websketch-ir) - rend
 
 ## Installation
 
+### Via Homebrew (macOS/Linux) - Recommended
+
+```bash
+brew tap mcp-tool-shop-org/mcp-tools
+brew install websketch-cli
+```
+
+### Via Local Development
+
 ```bash
 npm install -g websketch
 ```
