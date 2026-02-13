@@ -111,7 +111,7 @@ function cmdRenderAscii(args: string[]): void {
 
     console.log(output);
   } catch (err) {
-    console.error(`Error loading capture: ${err}`);
+    console.error(`Error loading capture: ${String(err)}`);
     process.exit(1);
   }
 }
@@ -144,7 +144,7 @@ function cmdFingerprint(args: string[]): void {
 
     console.log(fingerprint);
   } catch (err) {
-    console.error(`Error: ${err}`);
+    console.error(`Error: ${String(err)}`);
     process.exit(1);
   }
 }
@@ -190,7 +190,7 @@ function cmdDiff(args: string[]): void {
       console.log(formatDiff(result));
     }
   } catch (err) {
-    console.error(`Error: ${err}`);
+    console.error(`Error: ${String(err)}`);
     process.exit(1);
   }
 }
