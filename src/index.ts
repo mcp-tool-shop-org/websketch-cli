@@ -8,7 +8,7 @@
  *   diff <a.json> <b.json>       - Compare two captures
  */
 
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
 import { createRequire } from "module";
 
@@ -24,8 +24,37 @@ import {
   diff,
   formatDiff,
   formatDiffJson,
+  parseCapture,
+  isWebSketchException,
+  formatWebSketchError,
+  WebSketchException,
   type WebSketchCapture,
 } from "@mcptoolshop/websketch-ir";
+
+// =============================================================================
+// Error Handling
+// =============================================================================
+
+/**
+ * Handle any error with structured output and correct exit code.
+ * Exit codes:
+ *   0 — success
+ *   1 — validation / data error
+ *   2 — OS / filesystem error
+ */
+function handleError(err: unknown): never {
+  if (isWebSketchException(err)) {
+    console.error(formatWebSketchError(err.ws));
+    const code = err.ws.code;
+    if (code === "WS_NOT_FOUND" || code === "WS_PERMISSION_DENIED" || code === "WS_IO_ERROR") {
+      process.exit(2);
+    }
+    process.exit(1);
+  }
+  // Unknown error — wrap as internal
+  console.error(`[WS_INTERNAL] ${err instanceof Error ? err.message : String(err)}`);
+  process.exit(1);
+}
 
 // =============================================================================
 // Helpers
@@ -33,8 +62,32 @@ import {
 
 function loadCapture(path: string): WebSketchCapture {
   const fullPath = resolve(process.cwd(), path);
-  const content = readFileSync(fullPath, "utf-8");
-  return JSON.parse(content) as WebSketchCapture;
+
+  // File existence check → WS_NOT_FOUND
+  if (!existsSync(fullPath)) {
+    throw new WebSketchException({
+      code: "WS_NOT_FOUND",
+      message: `File not found: ${fullPath}`,
+      path: fullPath,
+      hint: "Check the file path and try again.",
+    });
+  }
+
+  let content: string;
+  try {
+    content = readFileSync(fullPath, "utf-8");
+  } catch (err) {
+    const errCode = (err as NodeJS.ErrnoException).code;
+    throw new WebSketchException({
+      code: errCode === "EACCES" ? "WS_PERMISSION_DENIED" : "WS_IO_ERROR",
+      message: `Cannot read file: ${fullPath}`,
+      path: fullPath,
+      cause: { name: (err as Error).name, message: (err as Error).message },
+    });
+  }
+
+  // parseCapture handles JSON parsing + schema validation
+  return parseCapture(content);
 }
 
 function printUsage(): void {
@@ -116,8 +169,7 @@ function cmdRenderAscii(args: string[]): void {
 
     console.log(output);
   } catch (err) {
-    console.error(`Error loading capture: ${err}`);
-    process.exit(1);
+    handleError(err);
   }
 }
 
@@ -149,8 +201,7 @@ function cmdFingerprint(args: string[]): void {
 
     console.log(fingerprint);
   } catch (err) {
-    console.error(`Error: ${err}`);
-    process.exit(1);
+    handleError(err);
   }
 }
 
@@ -195,8 +246,7 @@ function cmdDiff(args: string[]): void {
       console.log(formatDiff(result));
     }
   } catch (err) {
-    console.error(`Error: ${err}`);
-    process.exit(1);
+    handleError(err);
   }
 }
 
