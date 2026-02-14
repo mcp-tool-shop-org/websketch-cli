@@ -48,6 +48,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Build
+        run: npm run build
+
       - name: Run tests
         run: npm run test:run
 
@@ -57,9 +60,6 @@ jobs:
             echo "::error::Placeholder tests detected. Replace with real assertions or use it.skip() with a tracking issue."
             exit 1
           fi
-
-      - name: Build
-        run: npm run build
 
       - name: Smoke test - Help
         run: node dist/index.js --help
