@@ -3,9 +3,13 @@
  * WebSketch CLI
  *
  * Commands:
- *   render-ascii <capture.json>  - Render capture to ASCII
- *   fingerprint <capture.json>   - Compute structural fingerprint
- *   diff <a.json> <b.json>       - Compare two captures
+ *   validate <capture.json>       - Validate capture file
+ *   render <capture.json>         - Render capture to ASCII
+ *   fingerprint <capture.json>    - Compute structural fingerprint
+ *   diff <a.json> <b.json>        - Compare two captures
+ *
+ * Global flags:
+ *   --json    Machine-readable JSON output
  */
 
 import { existsSync, readFileSync } from "fs";
@@ -36,23 +40,55 @@ import {
 // =============================================================================
 
 /**
- * Handle any error with structured output and correct exit code.
- * Exit codes:
- *   0 — success
+ * Map a WebSketchError code to an exit code.
  *   1 — validation / data error
  *   2 — OS / filesystem error
  */
-function handleError(err: unknown): never {
+function exitCodeFor(code: string): number {
+  if (code === "WS_NOT_FOUND" || code === "WS_PERMISSION_DENIED" || code === "WS_IO_ERROR") {
+    return 2;
+  }
+  return 1;
+}
+
+/**
+ * Handle any error with structured output and correct exit code.
+ *
+ * In JSON mode: prints `{ ok: false, error: {...} }` to stdout.
+ * In text mode: prints human-readable error to stderr.
+ */
+function handleError(err: unknown, jsonMode: boolean): never {
   if (isWebSketchException(err)) {
-    console.error(formatWebSketchError(err.ws));
-    const code = err.ws.code;
-    if (code === "WS_NOT_FOUND" || code === "WS_PERMISSION_DENIED" || code === "WS_IO_ERROR") {
-      process.exit(2);
+    if (jsonMode) {
+      console.log(JSON.stringify({ ok: false, error: err.ws }));
+    } else {
+      console.error(formatWebSketchError(err.ws));
     }
-    process.exit(1);
+    process.exit(exitCodeFor(err.ws.code));
   }
   // Unknown error — wrap as internal
-  console.error(`[WS_INTERNAL] ${err instanceof Error ? err.message : String(err)}`);
+  const message = err instanceof Error ? err.message : String(err);
+  if (jsonMode) {
+    console.log(JSON.stringify({ ok: false, error: { code: "WS_INTERNAL", message } }));
+  } else {
+    console.error(`[WS_INTERNAL] ${message}`);
+  }
+  process.exit(1);
+}
+
+/**
+ * Handle missing required argument (no file path).
+ */
+function handleMissingArg(argDesc: string, jsonMode: boolean): never {
+  if (jsonMode) {
+    console.log(JSON.stringify({
+      ok: false,
+      error: { code: "WS_INVALID_ARGS", message: `Missing ${argDesc}` },
+    }));
+  } else {
+    console.error(`Error: Missing ${argDesc}`);
+    printUsage();
+  }
   process.exit(1);
 }
 
@@ -98,28 +134,36 @@ Usage:
   websketch <command> [options] <args>
 
 Commands:
-  render-ascii <capture.json>    Render capture to ASCII art
-    --width <n>                  Grid width (default: 80)
-    --height <n>                 Grid height (default: 24)
-    --llm                        Use LLM-optimized format with metadata
-    --structure                  Minimal structure-only view
+  validate <capture.json>       Validate a capture file
+  render <capture.json>         Render capture to ASCII art
+    --width <n>                 Grid width (default: 80)
+    --height <n>                Grid height (default: 24)
+    --llm                       Use LLM-optimized format with metadata
+    --structure                 Minimal structure-only view
+  fingerprint <capture.json>    Compute structural fingerprint
+    --layout-only               Ignore text content (layout-only fingerprint)
+  diff <a.json> <b.json>        Compare two captures
+    --layout-only               Ignore text content changes
+    --threshold <n>             Match threshold 0-1 (default: 0.5)
 
-  fingerprint <capture.json>     Compute structural fingerprint
-    --layout-only                Ignore text content (layout-only fingerprint)
+Global Flags:
+  --json                        Machine-readable JSON output
+  --version, -v                 Show version
+  --help, -h                    Show help
 
-  diff <a.json> <b.json>         Compare two captures
-    --layout-only                Ignore text content changes
-    --json                       Output as JSON
-    --threshold <n>              Match threshold 0-1 (default: 0.5)
+Exit Codes:
+  0  Success
+  1  Validation / data error
+  2  Filesystem error
 
 Examples:
-  websketch render-ascii capture.json
-  websketch render-ascii --llm capture.json
-  websketch render-ascii --width 120 --height 40 capture.json
+  websketch validate capture.json
+  websketch render capture.json
+  websketch render --llm capture.json
+  websketch --json render capture.json
   websketch fingerprint capture.json
-  websketch fingerprint --layout-only capture.json
   websketch diff before.json after.json
-  websketch diff --json before.json after.json
+  websketch --json diff before.json after.json
 `);
 }
 
@@ -127,7 +171,36 @@ Examples:
 // Commands
 // =============================================================================
 
-function cmdRenderAscii(args: string[]): void {
+function cmdValidate(args: string[], jsonMode: boolean): void {
+  let capturePath: string | null = null;
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (!arg.startsWith("-")) {
+      capturePath = arg;
+    }
+  }
+
+  if (!capturePath) {
+    handleMissingArg("capture file path", jsonMode);
+  }
+
+  try {
+    const capture = loadCapture(capturePath);
+    if (jsonMode) {
+      console.log(JSON.stringify({ ok: true, valid: true }));
+    } else {
+      console.log("Valid WebSketch capture.");
+      console.log(`  URL: ${capture.url}`);
+      console.log(`  Version: ${capture.version}`);
+      console.log(`  Root role: ${capture.root.role}`);
+    }
+  } catch (err) {
+    handleError(err, jsonMode);
+  }
+}
+
+function cmdRenderAscii(args: string[], jsonMode: boolean): void {
   let width = 80;
   let height = 24;
   let llmMode = false;
@@ -150,9 +223,7 @@ function cmdRenderAscii(args: string[]): void {
   }
 
   if (!capturePath) {
-    console.error("Error: Missing capture file path");
-    printUsage();
-    process.exit(1);
+    handleMissingArg("capture file path", jsonMode);
   }
 
   try {
@@ -167,13 +238,17 @@ function cmdRenderAscii(args: string[]): void {
       output = renderAscii(capture, { width, height });
     }
 
-    console.log(output);
+    if (jsonMode) {
+      console.log(JSON.stringify({ ok: true, ascii: output }));
+    } else {
+      console.log(output);
+    }
   } catch (err) {
-    handleError(err);
+    handleError(err, jsonMode);
   }
 }
 
-function cmdFingerprint(args: string[]): void {
+function cmdFingerprint(args: string[], jsonMode: boolean): void {
   let layoutOnly = false;
   let capturePath: string | null = null;
 
@@ -187,9 +262,7 @@ function cmdFingerprint(args: string[]): void {
   }
 
   if (!capturePath) {
-    console.error("Error: Missing capture file path");
-    printUsage();
-    process.exit(1);
+    handleMissingArg("capture file path", jsonMode);
   }
 
   try {
@@ -199,15 +272,19 @@ function cmdFingerprint(args: string[]): void {
       ? fingerprintLayout(capture)
       : fingerprintCapture(capture);
 
-    console.log(fingerprint);
+    if (jsonMode) {
+      console.log(JSON.stringify({ ok: true, fingerprint }));
+    } else {
+      console.log(fingerprint);
+    }
   } catch (err) {
-    handleError(err);
+    handleError(err, jsonMode);
   }
 }
 
-function cmdDiff(args: string[]): void {
+function cmdDiff(args: string[], jsonMode: boolean): void {
   let layoutOnly = false;
-  let jsonOutput = false;
+  let localJson = false;
   let threshold = 0.5;
   const paths: string[] = [];
 
@@ -216,7 +293,7 @@ function cmdDiff(args: string[]): void {
     if (arg === "--layout-only") {
       layoutOnly = true;
     } else if (arg === "--json") {
-      jsonOutput = true;
+      localJson = true;
     } else if (arg === "--threshold" && args[i + 1]) {
       threshold = parseFloat(args[++i]);
     } else if (!arg.startsWith("-")) {
@@ -225,9 +302,7 @@ function cmdDiff(args: string[]): void {
   }
 
   if (paths.length !== 2) {
-    console.error("Error: diff requires exactly 2 capture files");
-    printUsage();
-    process.exit(1);
+    handleMissingArg("exactly 2 capture files for diff", jsonMode);
   }
 
   try {
@@ -240,13 +315,17 @@ function cmdDiff(args: string[]): void {
       matchThreshold: threshold,
     });
 
-    if (jsonOutput) {
+    if (jsonMode) {
+      // Global --json: structured envelope with raw DiffResult
+      console.log(JSON.stringify({ ok: true, diff: result }));
+    } else if (localJson) {
+      // Local --json: formatted JSON string (legacy)
       console.log(formatDiffJson(result));
     } else {
       console.log(formatDiff(result));
     }
   } catch (err) {
-    handleError(err);
+    handleError(err, jsonMode);
   }
 }
 
@@ -267,23 +346,37 @@ function main(): void {
     process.exit(0);
   }
 
-  const command = args[0];
-  const commandArgs = args.slice(1);
+  // Extract global --json flag before command dispatch
+  const jsonMode = args.includes("--json");
+  const filteredArgs = args.filter((a) => a !== "--json");
+
+  const command = filteredArgs[0];
+  const commandArgs = filteredArgs.slice(1);
 
   switch (command) {
+    case "validate":
+      cmdValidate(commandArgs, jsonMode);
+      break;
     case "render-ascii":
     case "render":
     case "ascii":
-      cmdRenderAscii(commandArgs);
+      cmdRenderAscii(commandArgs, jsonMode);
       break;
     case "fingerprint":
     case "fp":
-      cmdFingerprint(commandArgs);
+      cmdFingerprint(commandArgs, jsonMode);
       break;
     case "diff":
-      cmdDiff(commandArgs);
+      cmdDiff(commandArgs, jsonMode);
       break;
     default:
+      if (jsonMode) {
+        console.log(JSON.stringify({
+          ok: false,
+          error: { code: "WS_INVALID_ARGS", message: `Unknown command: ${command}` },
+        }));
+        process.exit(1);
+      }
       console.error(`Unknown command: ${command}`);
       printUsage();
       process.exit(1);

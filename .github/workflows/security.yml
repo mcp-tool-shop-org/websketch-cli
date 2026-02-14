@@ -3,8 +3,12 @@ name: Security
 on:
   push:
     branches: [main, master]
+    paths:
+      - 'package.json'
   pull_request:
     branches: [main, master]
+    paths:
+      - 'package.json'
   schedule:
     # Run weekly on Monday at 00:00 UTC
     - cron: '0 0 * * 1'

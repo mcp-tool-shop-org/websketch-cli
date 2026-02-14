@@ -109,6 +109,31 @@ TOP CHANGES (by area)
   [ADDED] Added TOAST:notification at (70%, 10%)
 ```
 
+## Pipeline Mode (`--json`)
+
+Add `--json` before any command for machine-readable output:
+
+```bash
+websketch --json validate capture.json
+websketch --json render capture.json
+websketch --json fingerprint capture.json
+websketch --json diff before.json after.json
+```
+
+**Success:** `{ "ok": true, ... }` (shape depends on command)
+
+**Error:** `{ "ok": false, "error": { "code": "WS_...", "message": "..." } }`
+
+Exit codes still apply in JSON mode — use `$?` or `set -e` in scripts.
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | Validation / data error (bad JSON, invalid capture, unknown command) |
+| 2 | Filesystem error (file not found, permission denied, I/O error) |
+
 ## Capture Format
 
 This CLI works with WebSketch IR capture files (JSON). You can create captures using:
