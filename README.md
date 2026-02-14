@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/websketch-logo.png" alt="WebSketch" width="400">
+</p>
+
 # websketch
 
 CLI for [WebSketch IR](https://github.com/mcp-tool-shop-org/websketch-ir) - render, diff, and fingerprint web UI captures.
