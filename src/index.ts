@@ -10,6 +10,11 @@
 
 import { readFileSync } from "fs";
 import { resolve } from "path";
+import { createRequire } from "module";
+
+const _require = createRequire(import.meta.url);
+const pkg = _require("../package.json") as { version: string };
+
 import {
   renderAscii,
   renderForLLM,
@@ -34,7 +39,7 @@ function loadCapture(path: string): WebSketchCapture {
 
 function printUsage(): void {
   console.log(`
-WebSketch CLI v0.1.0
+WebSketch CLI v${pkg.version}
 
 Usage:
   websketch <command> [options] <args>
@@ -208,7 +213,7 @@ function main(): void {
   }
 
   if (args[0] === "--version" || args[0] === "-v") {
-    console.log("websketch v0.1.0");
+    console.log(`websketch v${pkg.version}`);
     process.exit(0);
   }
 

@@ -22,7 +22,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "validate": "npm run typecheck && npm run lint && npm run test:run",
+    "validate": "npm run typecheck && npm run lint && npm run build && npm run test:run",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [

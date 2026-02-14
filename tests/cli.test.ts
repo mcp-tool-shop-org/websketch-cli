@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import {
   renderAscii,
   renderForLLM,
@@ -26,5 +29,15 @@ describe('websketch-cli dependencies', () => {
     expect(typeof diff).toBe('function');
     expect(typeof formatDiff).toBe('function');
     expect(typeof formatDiffJson).toBe('function');
+  });
+});
+
+describe('CLI version output', () => {
+  it('--version matches package.json version', () => {
+    const pkgJson = JSON.parse(
+      readFileSync(join(process.cwd(), 'package.json'), 'utf-8')
+    );
+    const output = execSync('node dist/index.js --version', { encoding: 'utf-8' }).trim();
+    expect(output).toContain(pkgJson.version);
   });
 });
