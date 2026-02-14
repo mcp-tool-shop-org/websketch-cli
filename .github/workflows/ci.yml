@@ -51,6 +51,13 @@ jobs:
       - name: Run tests
         run: npm run test:run
 
+      - name: Check for placeholder tests
+        run: |
+          if grep -rn "expect(true)\.toBe(true)\|expect(1 + 1)\.toBe(2)\|it('placeholder'" tests/ src/__tests__/ 2>/dev/null; then
+            echo "::error::Placeholder tests detected. Replace with real assertions or use it.skip() with a tracking issue."
+            exit 1
+          fi
+
       - name: Build
         run: npm run build
 

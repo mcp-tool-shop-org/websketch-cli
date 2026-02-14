@@ -119,6 +119,10 @@ When adding new commands or flags:
 3. Verify help text and error messages
 4. Check edge cases (missing files, invalid JSON, etc.)
 
+### Test Quality
+
+Placeholder tests are not allowed on `main`. If a feature needs tests but you can't write them yet, use `it.skip('description', ...)` with a link to a tracking issue. The CI will reject patterns like `expect(true).toBe(true)` or `expect(1 + 1).toBe(2)`.
+
 ## Adding New Commands
 
 When adding a new command:
