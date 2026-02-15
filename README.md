@@ -4,18 +4,41 @@
 
 # websketch
 
+[![CI](https://github.com/mcp-tool-shop-org/websketch-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/websketch-cli/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@mcptoolshop/websketch.svg)](https://www.npmjs.com/package/@mcptoolshop/websketch)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 CLI for [WebSketch IR](https://github.com/mcp-tool-shop-org/websketch-ir) - render, diff, and fingerprint web UI captures.
+
+## Getting Started
+
+```bash
+# Install
+npm install -g @mcptoolshop/websketch
+
+# Capture a page with the Chrome extension, then:
+websketch validate capture.json
+websketch render capture.json
+websketch fingerprint capture.json
+websketch diff before.json after.json
+websketch bundle before.json after.json -o bundle.ws.json
+
+# Machine-readable output (pipe to jq, scripts, etc.)
+websketch --json validate capture.json
+```
+
+See the full [workflow guide](https://github.com/mcp-tool-shop-org/websketch-ir#getting-started) in websketch-ir.
 
 ## Installation
 
 ```bash
-npm install -g websketch
+npm install -g @mcptoolshop/websketch
 ```
 
 Or use via npx:
 
 ```bash
-npx websketch render-ascii capture.json
+npx @mcptoolshop/websketch render capture.json
 ```
 
 ## Commands

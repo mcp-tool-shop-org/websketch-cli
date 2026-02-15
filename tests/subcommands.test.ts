@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { writeFileSync, unlinkSync, mkdtempSync } from "fs";
+import { writeFileSync, readFileSync, unlinkSync, mkdtempSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { execSync } from "child_process";
@@ -146,17 +146,87 @@ describe("diff subcommand", () => {
 });
 
 // =============================================================================
+// bundle subcommand
+// =============================================================================
+
+describe("bundle subcommand", () => {
+  let tempDir: string;
+  tempDir = mkdtempSync(join(tmpdir(), "websketch-bundle-"));
+
+  it("bundle single file → stdout JSON with captures array", () => {
+    const filePath = join(tempDir, "single.json");
+    writeFileSync(filePath, JSON.stringify(validCapture));
+    const stdout = execSync(`node dist/index.js bundle "${filePath}"`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+    });
+    const bundle = JSON.parse(stdout);
+    expect(bundle.schemaVersion).toBe("0.1");
+    expect(bundle.captures).toHaveLength(1);
+    expect(bundle.tool).toContain("websketch-cli");
+    expect(bundle.createdAt).toBeDefined();
+    unlinkSync(filePath);
+  });
+
+  it("bundle two files → includes diff summary", () => {
+    const fileA = join(tempDir, "a.json");
+    const fileB = join(tempDir, "b.json");
+    writeFileSync(fileA, JSON.stringify(validCapture));
+    writeFileSync(fileB, JSON.stringify(validCapture));
+    const stdout = execSync(`node dist/index.js bundle "${fileA}" "${fileB}"`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+    });
+    const bundle = JSON.parse(stdout);
+    expect(bundle.captures).toHaveLength(2);
+    expect(bundle.diff).toBeDefined();
+    expect(bundle.diff.summary).toBeDefined();
+    unlinkSync(fileA);
+    unlinkSync(fileB);
+  });
+
+  it("bundle -o writes to file", () => {
+    const filePath = join(tempDir, "src.json");
+    const outPath = join(tempDir, "out.ws.json");
+    writeFileSync(filePath, JSON.stringify(validCapture));
+    const stdout = execSync(`node dist/index.js bundle "${filePath}" -o "${outPath}"`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+    });
+    expect(stdout).toContain("Bundle written");
+    const content = JSON.parse(readFileSync(outPath, "utf-8"));
+    expect(content.captures).toHaveLength(1);
+    unlinkSync(filePath);
+    unlinkSync(outPath);
+  });
+
+  it("--json bundle → envelope with ok:true", () => {
+    const filePath = join(tempDir, "json-mode.json");
+    writeFileSync(filePath, JSON.stringify(validCapture));
+    const stdout = execSync(`node dist/index.js --json bundle "${filePath}"`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+    });
+    const result = JSON.parse(stdout);
+    expect(result.ok).toBe(true);
+    expect(result.bundle.captures).toHaveLength(1);
+    unlinkSync(filePath);
+  });
+});
+
+// =============================================================================
 // help text
 // =============================================================================
 
 describe("help text", () => {
-  it("--help shows validate and render as commands", () => {
+  it("--help shows validate, render, and bundle as commands", () => {
     const stdout = execSync("node dist/index.js --help", {
       encoding: "utf-8",
       stdio: "pipe",
     });
     expect(stdout).toContain("validate");
     expect(stdout).toContain("render");
+    expect(stdout).toContain("bundle");
     expect(stdout).toContain("--json");
     expect(stdout).toContain("Exit Codes");
   });

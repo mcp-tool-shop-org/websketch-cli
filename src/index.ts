@@ -12,7 +12,7 @@
  *   --json    Machine-readable JSON output
  */
 
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { createRequire } from "module";
 
@@ -145,6 +145,8 @@ Commands:
   diff <a.json> <b.json>        Compare two captures
     --layout-only               Ignore text content changes
     --threshold <n>             Match threshold 0-1 (default: 0.5)
+  bundle <files...> [-o out]    Package captures into a shareable bundle
+    -o <path>                   Write bundle to file (default: stdout)
 
 Global Flags:
   --json                        Machine-readable JSON output
@@ -164,6 +166,8 @@ Examples:
   websketch fingerprint capture.json
   websketch diff before.json after.json
   websketch --json diff before.json after.json
+  websketch bundle capture.json -o bundle.ws.json
+  websketch bundle before.json after.json -o bundle.ws.json
 `);
 }
 
@@ -187,13 +191,22 @@ function cmdValidate(args: string[], jsonMode: boolean): void {
 
   try {
     const capture = loadCapture(capturePath);
+    // Surface embedded warnings (e.g. truncation from extension)
+    const rawCapture = capture as unknown as Record<string, unknown>;
+    const warnArr = Array.isArray(rawCapture.warnings) ? (rawCapture.warnings as string[]) : [];
+
     if (jsonMode) {
-      console.log(JSON.stringify({ ok: true, valid: true }));
+      const result: Record<string, unknown> = { ok: true, valid: true };
+      if (warnArr.length > 0) result.warnings = warnArr;
+      console.log(JSON.stringify(result));
     } else {
       console.log("Valid WebSketch capture.");
       console.log(`  URL: ${capture.url}`);
       console.log(`  Version: ${capture.version}`);
       console.log(`  Root role: ${capture.root.role}`);
+      for (const w of warnArr) {
+        console.log(`  Warning: ${w}`);
+      }
     }
   } catch (err) {
     handleError(err, jsonMode);
@@ -329,6 +342,69 @@ function cmdDiff(args: string[], jsonMode: boolean): void {
   }
 }
 
+function cmdBundle(args: string[], jsonMode: boolean): void {
+  let outputPath: string | null = null;
+  const paths: string[] = [];
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === "-o" && args[i + 1]) {
+      outputPath = args[++i];
+    } else if (!arg.startsWith("-")) {
+      paths.push(arg);
+    }
+  }
+
+  if (paths.length === 0) {
+    handleMissingArg("at least 1 capture file for bundle", jsonMode);
+  }
+
+  try {
+    const captures = paths.map((p) => ({
+      file: p,
+      capture: loadCapture(p),
+    }));
+
+    const bundle: Record<string, unknown> = {
+      schemaVersion: "0.1",
+      createdAt: new Date().toISOString(),
+      tool: `websketch-cli/${pkg.version}`,
+      captures: captures.map(({ file, capture }) => ({
+        source: file,
+        capture,
+      })),
+    };
+
+    // If exactly 2 captures, include diff summary
+    if (captures.length === 2) {
+      const diffResult = diff(captures[0].capture, captures[1].capture);
+      bundle.diff = {
+        summary: diffResult.summary,
+        changes: diffResult.changes,
+      };
+    }
+
+    const json = JSON.stringify(bundle, null, 2);
+
+    if (outputPath) {
+      writeFileSync(resolve(process.cwd(), outputPath), json, "utf-8");
+      if (jsonMode) {
+        console.log(JSON.stringify({ ok: true, output: outputPath, captures: captures.length }));
+      } else {
+        console.log(`Bundle written to ${outputPath} (${captures.length} capture${captures.length > 1 ? "s" : ""})`);
+      }
+    } else {
+      if (jsonMode) {
+        console.log(JSON.stringify({ ok: true, bundle }));
+      } else {
+        console.log(json);
+      }
+    }
+  } catch (err) {
+    handleError(err, jsonMode);
+  }
+}
+
 // =============================================================================
 // Main
 // =============================================================================
@@ -368,6 +444,9 @@ function main(): void {
       break;
     case "diff":
       cmdDiff(commandArgs, jsonMode);
+      break;
+    case "bundle":
+      cmdBundle(commandArgs, jsonMode);
       break;
     default:
       if (jsonMode) {

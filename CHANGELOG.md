@@ -1,27 +1,28 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## 0.3.0
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+- **feat**: `bundle` subcommand -- package captures into shareable `.ws.json` files
+- **feat**: Warnings surfaced from captures in `validate` output
+- **docs**: Getting Started quickstart block
+- **docs**: CHANGELOG.md
+- **chore**: Bump websketch-ir to ^0.3.0
 
-## [Unreleased]
+## 0.2.1
 
-### Added
-- Initial CI/CD setup with GitHub Actions
-- ESLint and TypeScript strict checking
-- Vitest test framework
-- Security scanning with Dependabot and npm audit
-- Comprehensive documentation (CONTRIBUTING, CODE_OF_CONDUCT)
+- **feat**: `--json` global flag for machine-readable pipeline output
+- **feat**: `validate` subcommand
+- **feat**: `render` and `diff` promoted as first-class command names
+- **feat**: Exit codes documented (0=success, 1=validation, 2=filesystem)
+- **fix**: CI build order (build before test)
 
-## [0.1.0] - 2024-01-29
+## 0.2.0
 
-### Added
+- **feat**: Structured error handling with `WebSketchException`
+- **feat**: All error codes mapped to exit codes
+- **chore**: Bump websketch-ir to ^0.3.0
+
+## 0.1.0
+
 - Initial release
-- `render-ascii` command for ASCII wireframe rendering
-- `fingerprint` command for structural hashing
-- `diff` command for comparing captures
-- Support for LLM-optimized output format
-- Layout-only comparison mode
-- Custom grid dimensions for ASCII rendering
-- JSON output format for diffs
+- Commands: render-ascii, fingerprint, diff
