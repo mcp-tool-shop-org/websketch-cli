@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-02-18
+
+### Added
+- HANDBOOK.md — deep-dive guide covering architecture, commands, pipeline patterns, integration, and FAQ
+
+### Changed
+- README.md — rewritten with "At a Glance" section, ecosystem links, docs table, standardized badge row
+
 ## 0.3.0
 
 - **feat**: `bundle` subcommand -- package captures into shareable `.ws.json` files

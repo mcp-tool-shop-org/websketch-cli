@@ -1,47 +1,47 @@
-<p align="center">
-  <img src=".github/websketch-logo.png" alt="WebSketch" width="400">
-</p>
+<p align="center"><img src="logo.png" alt="websketch logo" width="200"></p>
 
 # websketch
 
-[![CI](https://github.com/mcp-tool-shop-org/websketch-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/websketch-cli/actions/workflows/ci.yml)
+> Part of [MCP Tool Shop](https://mcptoolshop.com)
+
+**CLI for WebSketch IR -- render, diff, and fingerprint web UI captures so LLMs and CI pipelines can reason about what users see.**
+
 [![npm version](https://img.shields.io/npm/v/@mcptoolshop/websketch.svg)](https://www.npmjs.com/package/@mcptoolshop/websketch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![node 18+](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
 
-CLI for [WebSketch IR](https://github.com/mcp-tool-shop-org/websketch-ir) - render, diff, and fingerprint web UI captures.
+---
 
-## Getting Started
+## At a Glance
 
-```bash
-# Install
-npm install -g @mcptoolshop/websketch
+- **ASCII rendering** -- turn any WebSketch capture into a box-drawing layout that fits in a terminal or LLM context window
+- **Structural fingerprinting** -- hash a page's layout so you can detect changes without pixel diffing
+- **Semantic diff** -- compare two captures and get a ranked change report (added, moved, resized, text changed)
+- **Bundle packaging** -- combine captures (and optional diff) into a single shareable `.ws.json` file
+- **Pipeline-first** -- every command supports `--json` output and deterministic exit codes for CI scripting
+- **LLM-optimized mode** -- `--llm` flag produces metadata-rich output designed for agent consumption
 
-# Capture a page with the Chrome extension, then:
-websketch validate capture.json
-websketch render capture.json
-websketch fingerprint capture.json
-websketch diff before.json after.json
-websketch bundle before.json after.json -o bundle.ws.json
-
-# Machine-readable output (pipe to jq, scripts, etc.)
-websketch --json validate capture.json
-```
-
-See the full [workflow guide](https://github.com/mcp-tool-shop-org/websketch-ir#getting-started) in websketch-ir.
-
-## Installation
+## Install
 
 ```bash
-npm install -g @mcptoolshop/websketch
+pnpm add -g @mcptoolshop/websketch
 ```
 
-Or use via npx:
+Or run without installing:
 
 ```bash
 npx @mcptoolshop/websketch render capture.json
 ```
 
 ## Commands
+
+### validate
+
+Check that a capture file conforms to the WebSketch IR schema.
+
+```bash
+websketch validate capture.json
+```
 
 ### render-ascii
 
@@ -64,16 +64,16 @@ websketch render-ascii --structure capture.json
 **Example output:**
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────┐
-│[NAV:primary_nav]                                                             │
-├──────────────────────────────────────────────────────────────────────────────┤
-│                    ┌────────────────────────────────────────┐                │
-│                    │[FRM:login]                             │                │
-│                    │  [INP:email]                           │                │
-│                    │  [INP:password]                        │                │
-│                    │  [BTN:primary_cta]                     │                │
-│                    └────────────────────────────────────────┘                │
-└──────────────────────────────────────────────────────────────────────────────┘
++---------------------------------------------------------------------------+
+|[NAV:primary_nav]                                                          |
++---------------------------------------------------------------------------+
+|                    +----------------------------------------+             |
+|                    |[FRM:login]                             |             |
+|                    |  [INP:email]                           |             |
+|                    |  [INP:password]                        |             |
+|                    |  [BTN:primary_cta]                     |             |
+|                    +----------------------------------------+             |
++---------------------------------------------------------------------------+
 ```
 
 ### fingerprint
@@ -107,32 +107,16 @@ websketch diff --layout-only before.json after.json
 websketch diff --threshold 0.7 before.json after.json
 ```
 
-**Example output:**
+### bundle
 
-```
-WebSketch IR Diff Report
-════════════════════════════════════════════════════════════
+Package one or more captures into a shareable `.ws.json` file. When exactly two captures are provided, the bundle automatically includes a diff summary.
 
-SUMMARY
-────────────────────────────────────────
-Nodes: 14 → 16
-Identical: No
-
-CHANGE COUNTS
-────────────────────────────────────────
-  Added:      2
-  Moved:      6
-  Resized:    2
-  Text:       2
-
-TOP CHANGES (by area)
-────────────────────────────────────────
-  [CHILDREN_CHANGED] PAGE children: 3 → 4
-  [MOVED] FORM:login moved by (0.0%, 2.0%)
-  [ADDED] Added TOAST:notification at (70%, 10%)
+```bash
+websketch bundle capture.json -o bundle.ws.json
+websketch bundle before.json after.json -o bundle.ws.json
 ```
 
-## Pipeline Mode (`--json`)
+## Pipeline Mode
 
 Add `--json` before any command for machine-readable output:
 
@@ -143,11 +127,11 @@ websketch --json fingerprint capture.json
 websketch --json diff before.json after.json
 ```
 
-**Success:** `{ "ok": true, ... }` (shape depends on command)
+**Success:** `{ "ok": true, ... }`
 
 **Error:** `{ "ok": false, "error": { "code": "WS_...", "message": "..." } }`
 
-Exit codes still apply in JSON mode — use `$?` or `set -e` in scripts.
+Exit codes still apply in JSON mode -- use `$?` or `set -e` in scripts.
 
 ## Exit Codes
 
@@ -159,37 +143,20 @@ Exit codes still apply in JSON mode — use `$?` or `set -e` in scripts.
 
 ## Capture Format
 
-This CLI works with WebSketch IR capture files (JSON). You can create captures using:
+This CLI works with WebSketch IR capture files (JSON). Create captures using:
 
-- [websketch-extension](https://github.com/mcp-tool-shop-org/websketch-extension) - Chrome extension
-- Programmatically via [@mcptoolshop/websketch-ir](https://github.com/mcp-tool-shop-org/websketch-ir)
+- [websketch-extension](https://github.com/mcp-tool-shop-org/websketch-extension) -- Chrome extension for one-click page capture
+- [@mcptoolshop/websketch-ir](https://github.com/mcp-tool-shop-org/websketch-ir) -- build captures programmatically
 
-## Development
+## Docs
 
-```bash
-# Install dependencies
-npm install
-
-# Type check
-npm run typecheck
-
-# Lint
-npm run lint
-
-# Run tests
-npm test
-
-# Build
-npm run build
-
-# Test locally
-node dist/index.js --help
-```
+| Document | Description |
+|----------|-------------|
+| [HANDBOOK.md](HANDBOOK.md) | Deep-dive guide: architecture, commands, pipeline patterns, integration |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, dev setup, PR guidelines |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |
+| [CHANGELOG.md](CHANGELOG.md) | Release history |
 
 ## License
 
 MIT
-
-## Author
-
-[MCP Tool Shop](https://github.com/mcp-tool-shop)
