@@ -2,13 +2,14 @@
 
 # websketch
 
-> Part of [MCP Tool Shop](https://mcptoolshop.com)
+> Part of [MCP Tool Shop](https://mcp-tool-shop.github.io/)
 
 **CLI for WebSketch IR -- render, diff, and fingerprint web UI captures so LLMs and CI pipelines can reason about what users see.**
 
+[![CI](https://github.com/mcp-tool-shop-org/websketch-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/mcp-tool-shop-org/websketch-cli/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@mcptoolshop/websketch.svg)](https://www.npmjs.com/package/@mcptoolshop/websketch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![node 18+](https://img.shields.io/badge/node-18%2B-brightgreen.svg)](https://nodejs.org)
+[![node 20+](https://img.shields.io/badge/node-20%2B-brightgreen.svg)](https://nodejs.org)
 
 ---
 
