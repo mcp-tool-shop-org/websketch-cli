@@ -20,32 +20,32 @@
   <a href="https://mcp-tool-shop-org.github.io/websketch-cli/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page"></a>
 </p>
 
-## At a Glance
+## Visão Geral
 
-- **ASCII rendering** -- turn any WebSketch capture into a box-drawing layout that fits in a terminal or LLM context window
-- **Structural fingerprinting** -- hash a page's layout so you can detect changes without pixel diffing
-- **Semantic diff** -- compare two captures and get a ranked change report (added, moved, resized, text changed)
-- **Bundle packaging** -- combine captures (and optional diff) into a single shareable `.ws.json` file
-- **Pipeline-first** -- every command supports `--json` output and deterministic exit codes for CI scripting
-- **LLM-optimized mode** -- `--llm` flag produces metadata-rich output designed for agent consumption
+- **Renderização em ASCII:** Converta qualquer captura do WebSketch em um layout de desenho de caixas que se encaixe em um terminal ou em uma janela de contexto de LLM.
+- **Impressão digital estrutural:** Calcule um hash do layout de uma página para que você possa detectar alterações sem comparar pixels.
+- **Diferença semântica:** Compare duas capturas e obtenha um relatório de alterações classificado (adicionado, movido, redimensionado, texto alterado).
+- **Empacotamento em lote:** Combine capturas (e, opcionalmente, a diferença) em um único arquivo `.ws.json` compartilhável.
+- **Foco em pipelines:** Todos os comandos suportam a saída `--json` e códigos de saída determinísticos para scripts de CI.
+- **Modo otimizado para LLM:** A flag `--llm` produz uma saída rica em metadados, projetada para ser consumida por agentes.
 
-## Install
+## Instalação
 
 ```bash
 pnpm add -g @mcptoolshop/websketch
 ```
 
-Or run without installing:
+Ou execute sem instalar:
 
 ```bash
 npx @mcptoolshop/websketch render capture.json
 ```
 
-## Commands
+## Comandos
 
 ### validate
 
-Check that a capture file conforms to the WebSketch IR schema.
+Verifica se um arquivo de captura está em conformidade com o esquema WebSketch IR.
 
 ```bash
 websketch validate capture.json
@@ -53,7 +53,7 @@ websketch validate capture.json
 
 ### render-ascii
 
-Render a capture to ASCII art (LLM-readable).
+Renderiza uma captura em arte ASCII (legível para LLM).
 
 ```bash
 # Default 80x24 grid
@@ -69,7 +69,7 @@ websketch render-ascii --width 120 --height 40 capture.json
 websketch render-ascii --structure capture.json
 ```
 
-**Example output:**
+**Exemplo de saída:**
 
 ```
 +---------------------------------------------------------------------------+
@@ -86,7 +86,7 @@ websketch render-ascii --structure capture.json
 
 ### fingerprint
 
-Compute a structural fingerprint for comparison.
+Calcula uma impressão digital estrutural para comparação.
 
 ```bash
 # Full fingerprint (includes text)
@@ -99,7 +99,7 @@ websketch fingerprint --layout-only capture.json
 
 ### diff
 
-Compare two captures and report changes.
+Compara duas capturas e relata as alterações.
 
 ```bash
 # Human-readable diff report
@@ -117,16 +117,16 @@ websketch diff --threshold 0.7 before.json after.json
 
 ### bundle
 
-Package one or more captures into a shareable `.ws.json` file. When exactly two captures are provided, the bundle automatically includes a diff summary.
+Empacota uma ou mais capturas em um arquivo `.ws.json` compartilhável. Quando exatamente duas capturas são fornecidas, o pacote inclui automaticamente um resumo da diferença.
 
 ```bash
 websketch bundle capture.json -o bundle.ws.json
 websketch bundle before.json after.json -o bundle.ws.json
 ```
 
-## Pipeline Mode
+## Modo Pipeline
 
-Add `--json` before any command for machine-readable output:
+Adicione `--json` antes de qualquer comando para obter uma saída legível por máquina:
 
 ```bash
 websketch --json validate capture.json
@@ -135,36 +135,36 @@ websketch --json fingerprint capture.json
 websketch --json diff before.json after.json
 ```
 
-**Success:** `{ "ok": true, ... }`
+**Sucesso:** `{ "ok": true, ... }`
 
-**Error:** `{ "ok": false, "error": { "code": "WS_...", "message": "..." } }`
+**Erro:** `{ "ok": false, "error": { "code": "WS_...", "message": "..." } }`
 
-Exit codes still apply in JSON mode -- use `$?` or `set -e` in scripts.
+Os códigos de saída ainda se aplicam no modo JSON – use `$?` ou `set -e` em scripts.
 
-## Exit Codes
+## Códigos de Saída
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Validation / data error (bad JSON, invalid capture, unknown command) |
-| 2 | Filesystem error (file not found, permission denied, I/O error) |
+| Code | Significado |
+| ------ | --------- |
+| 0 | Sucesso |
+| 1 | Erro de validação / dados (JSON inválido, captura inválida, comando desconhecido) |
+| 2 | Erro do sistema de arquivos (arquivo não encontrado, permissão negada, erro de E/S) |
 
-## Capture Format
+## Formato da Captura
 
-This CLI works with WebSketch IR capture files (JSON). Create captures using:
+Esta CLI funciona com arquivos de captura WebSketch IR (JSON). Crie capturas usando:
 
-- [websketch-extension](https://github.com/mcp-tool-shop-org/websketch-extension) -- Chrome extension for one-click page capture
-- [@mcptoolshop/websketch-ir](https://github.com/mcp-tool-shop-org/websketch-ir) -- build captures programmatically
+- [websketch-extension](https://github.com/mcp-tool-shop-org/websketch-extension) -- Extensão do Chrome para captura de página com um clique.
+- [@mcptoolshop/websketch-ir](https://github.com/mcp-tool-shop-org/websketch-ir) -- Crie capturas programaticamente.
 
-## Docs
+## Documentação
 
-| Document | Description |
-|----------|-------------|
-| [HANDBOOK.md](HANDBOOK.md) | Deep-dive guide: architecture, commands, pipeline patterns, integration |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, dev setup, PR guidelines |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |
-| [CHANGELOG.md](CHANGELOG.md) | Release history |
+| Documento | Descrição |
+| ---------- | ------------- |
+| [HANDBOOK.md](HANDBOOK.md) | Guia detalhado: arquitetura, comandos, padrões de pipeline, integração. |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Como contribuir, configuração de desenvolvimento, diretrizes para PRs. |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Padrões da comunidade. |
+| [CHANGELOG.md](CHANGELOG.md) | Histórico de lançamentos. |
 
-## License
+## Licença
 
 MIT

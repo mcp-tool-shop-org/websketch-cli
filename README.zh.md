@@ -20,32 +20,32 @@
   <a href="https://mcp-tool-shop-org.github.io/websketch-cli/"><img src="https://img.shields.io/badge/Landing_Page-live-blue" alt="Landing Page"></a>
 </p>
 
-## At a Glance
+## 概述
 
-- **ASCII rendering** -- turn any WebSketch capture into a box-drawing layout that fits in a terminal or LLM context window
-- **Structural fingerprinting** -- hash a page's layout so you can detect changes without pixel diffing
-- **Semantic diff** -- compare two captures and get a ranked change report (added, moved, resized, text changed)
-- **Bundle packaging** -- combine captures (and optional diff) into a single shareable `.ws.json` file
-- **Pipeline-first** -- every command supports `--json` output and deterministic exit codes for CI scripting
-- **LLM-optimized mode** -- `--llm` flag produces metadata-rich output designed for agent consumption
+- **ASCII 渲染**：将任何 WebSketch 截图转换为适合终端或 LLM 上下文窗口的盒图布局。
+- **结构指纹**：对页面的布局进行哈希处理，以便在不进行像素差异比较的情况下检测更改。
+- **语义差异**：比较两个截图，并生成一个排序的变更报告（添加、移动、调整大小、文本更改）。
+- **捆绑打包**：将截图（以及可选的差异）合并到单个可共享的 `.ws.json` 文件中。
+- **流水线优先**：每个命令都支持 `--json` 输出以及用于 CI 脚本的确定性退出码。
+- **LLM 优化模式**：`--llm` 标志生成包含丰富元数据的输出，专为代理程序使用而设计。
 
-## Install
+## 安装
 
 ```bash
 pnpm add -g @mcptoolshop/websketch
 ```
 
-Or run without installing:
+或者，无需安装即可运行：
 
 ```bash
 npx @mcptoolshop/websketch render capture.json
 ```
 
-## Commands
+## 命令
 
 ### validate
 
-Check that a capture file conforms to the WebSketch IR schema.
+检查截图文件是否符合 WebSketch IR 模式。
 
 ```bash
 websketch validate capture.json
@@ -53,7 +53,7 @@ websketch validate capture.json
 
 ### render-ascii
 
-Render a capture to ASCII art (LLM-readable).
+将截图渲染为 ASCII 艺术（LLM 可读）。
 
 ```bash
 # Default 80x24 grid
@@ -69,7 +69,7 @@ websketch render-ascii --width 120 --height 40 capture.json
 websketch render-ascii --structure capture.json
 ```
 
-**Example output:**
+**示例输出：**
 
 ```
 +---------------------------------------------------------------------------+
@@ -86,7 +86,7 @@ websketch render-ascii --structure capture.json
 
 ### fingerprint
 
-Compute a structural fingerprint for comparison.
+计算结构指纹以进行比较。
 
 ```bash
 # Full fingerprint (includes text)
@@ -99,7 +99,7 @@ websketch fingerprint --layout-only capture.json
 
 ### diff
 
-Compare two captures and report changes.
+比较两个截图并报告更改。
 
 ```bash
 # Human-readable diff report
@@ -117,16 +117,16 @@ websketch diff --threshold 0.7 before.json after.json
 
 ### bundle
 
-Package one or more captures into a shareable `.ws.json` file. When exactly two captures are provided, the bundle automatically includes a diff summary.
+将一个或多个截图打包到可共享的 `.ws.json` 文件中。当提供两个截图时，该捆绑包会自动包含差异摘要。
 
 ```bash
 websketch bundle capture.json -o bundle.ws.json
 websketch bundle before.json after.json -o bundle.ws.json
 ```
 
-## Pipeline Mode
+## 流水线模式
 
-Add `--json` before any command for machine-readable output:
+在任何命令之前添加 `--json` 以获得机器可读的输出：
 
 ```bash
 websketch --json validate capture.json
@@ -135,36 +135,36 @@ websketch --json fingerprint capture.json
 websketch --json diff before.json after.json
 ```
 
-**Success:** `{ "ok": true, ... }`
+**成功：** `{ "ok": true, ... }`
 
-**Error:** `{ "ok": false, "error": { "code": "WS_...", "message": "..." } }`
+**错误：** `{ "ok": false, "error": { "code": "WS_...", "message": "..." } }`
 
-Exit codes still apply in JSON mode -- use `$?` or `set -e` in scripts.
+即使在 JSON 模式下，退出码仍然有效。在脚本中使用 `$?` 或 `set -e`。
 
-## Exit Codes
+## 退出码
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Validation / data error (bad JSON, invalid capture, unknown command) |
-| 2 | Filesystem error (file not found, permission denied, I/O error) |
+| Code | 含义 |
+| ------ | --------- |
+| 0 | 成功 |
+| 1 | 验证/数据错误（无效 JSON、无效截图、未知命令） |
+| 2 | 文件系统错误（文件未找到、权限被拒绝、I/O 错误） |
 
-## Capture Format
+## 截图格式
 
-This CLI works with WebSketch IR capture files (JSON). Create captures using:
+此 CLI 适用于 WebSketch IR 截图文件（JSON）。使用以下方法创建截图：
 
-- [websketch-extension](https://github.com/mcp-tool-shop-org/websketch-extension) -- Chrome extension for one-click page capture
-- [@mcptoolshop/websketch-ir](https://github.com/mcp-tool-shop-org/websketch-ir) -- build captures programmatically
+- [websketch-extension](https://github.com/mcp-tool-shop-org/websketch-extension)：Chrome 扩展程序，用于一键页面截图。
+- [@mcptoolshop/websketch-ir](https://github.com/mcp-tool-shop-org/websketch-ir)：用于以编程方式创建截图。
 
-## Docs
+## 文档
 
-| Document | Description |
-|----------|-------------|
-| [HANDBOOK.md](HANDBOOK.md) | Deep-dive guide: architecture, commands, pipeline patterns, integration |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute, dev setup, PR guidelines |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |
-| [CHANGELOG.md](CHANGELOG.md) | Release history |
+| 文档 | 描述 |
+| ---------- | ------------- |
+| [HANDBOOK.md](HANDBOOK.md) | 深入指南：架构、命令、流水线模式、集成。 |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 如何贡献、开发环境设置、PR 指南。 |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | 社区标准。 |
+| [CHANGELOG.md](CHANGELOG.md) | 发布历史。 |
 
-## License
+## 许可证
 
 MIT
