@@ -9,9 +9,7 @@
   <a href="README.pt-BR.md">Português</a>
 </p>
 
-<p align="center">
-            <img src="https://raw.githubusercontent.com/mcp-tool-shop-org/brand/main/logos/websketch-cli/readme.png"
-           alt="WebSketch CLI" width="400"></p>
+<p align="center"><img src="assets/logo.png" alt="WebSketch CLI" width="400"></p>
 
 <p align="center"><strong>CLI for WebSketch IR — render, diff, and fingerprint web UI captures so LLMs and CI pipelines can reason about what users see.</strong></p>
 
