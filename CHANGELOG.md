@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 — 2026-02-27
+
+### Changed
+- Promoted to v1.0.0 — production-ready release
+- Added SECURITY.md, SHIP_GATE.md, SCORECARD.md
+- Added Security & Data Scope and Scorecard to README
+
 ## 0.4.0 — 2026-02-18
 
 ### Added

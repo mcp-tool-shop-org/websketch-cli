@@ -165,6 +165,31 @@ This CLI works with WebSketch IR capture files (JSON). Create captures using:
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community standards |
 | [CHANGELOG.md](CHANGELOG.md) | Release history |
 
+## Security & Data Scope
+
+| Aspect | Detail |
+|--------|--------|
+| **Data touched** | WebSketch IR JSON files (read), rendered ASCII/diff/fingerprint output (write to stdout/files) |
+| **Data NOT touched** | No telemetry, no analytics, no network calls, no credential storage |
+| **Permissions** | Read: input JSON files. Write: output files to user-specified paths |
+| **Network** | None — fully offline CLI tool |
+| **Telemetry** | None collected or sent |
+
+See [SECURITY.md](SECURITY.md) for vulnerability reporting.
+
+## Scorecard
+
+| Category | Score |
+|----------|-------|
+| A. Security | 10 |
+| B. Error Handling | 10 |
+| C. Operator Docs | 10 |
+| D. Shipping Hygiene | 10 |
+| E. Identity (soft) | 10 |
+| **Overall** | **50/50** |
+
+> Full audit: [SHIP_GATE.md](SHIP_GATE.md) · [SCORECARD.md](SCORECARD.md)
+
 ## License
 
 MIT
