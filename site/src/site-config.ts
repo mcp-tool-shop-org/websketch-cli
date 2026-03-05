@@ -15,7 +15,7 @@ export const config: SiteConfig = {
     headlineAccent: 'In plain text.',
     description: 'Render, diff, and fingerprint web UI captures so LLMs and CI pipelines can reason about what users see. ASCII art, structural hashes, semantic diffs — all from one CLI.',
     primaryCta: { href: '#commands', label: 'See commands' },
-    secondaryCta: { href: '#features', label: 'Explore features' },
+    secondaryCta: { href: 'handbook/', label: 'Read the Handbook' },
     previews: [
       { label: 'Install', code: 'pnpm add -g @mcptoolshop/websketch' },
       { label: 'Render', code: 'websketch render-ascii capture.json' },
