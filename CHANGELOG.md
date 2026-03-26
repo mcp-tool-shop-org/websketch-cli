@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 — 2026-03-25
+
+### Added
+
+- 5 version consistency tests (semver, >= 1.0.0, CHANGELOG, scope, --version flag)
+- SHA-pinned GitHub Actions in all 3 workflows
+
 ## 1.0.0 — 2026-02-27
 
 ### Changed
