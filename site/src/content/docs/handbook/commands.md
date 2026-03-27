@@ -17,6 +17,8 @@ Returns exit code 0 on success, 1 on validation failure.
 
 ## render-ascii
 
+Aliases: `render`, `ascii`
+
 Render a capture to ASCII art — an LLM-readable box-drawing layout.
 
 ```bash
@@ -36,6 +38,8 @@ websketch render-ascii --structure capture.json
 The `--llm` flag produces metadata-rich output designed for agent consumption, including URL, viewport dimensions, and a legend explaining the shorthand notation.
 
 ## fingerprint
+
+Alias: `fp`
 
 Compute a structural fingerprint for comparison.
 

@@ -13,5 +13,6 @@ Welcome to the WebSketch CLI handbook — the complete guide to rendering, diffi
 - **[Commands](/websketch-cli/handbook/commands/)** — Deep dive into every command
 - **[Pipeline Patterns](/websketch-cli/handbook/pipeline-patterns/)** — CI integration, JSON mode, and LLM workflows
 - **[Reference](/websketch-cli/handbook/reference/)** — Exit codes, capture format, ecosystem
+- **[Beginners Guide](/websketch-cli/handbook/beginners/)** — Step-by-step walkthrough for first-time users
 
 [Back to landing page](/websketch-cli/)
